@@ -19,15 +19,4 @@ sub _recurse_fields {
   $self->next::method($fields) unless $fields->{-window};
 }
 
-# NOTE - this is tested using the below code.
-# BEGIN { $ENV{TEST_ACTIVE} = 1 }
-# use Maple::Common;
-# use Maple::DB;
-# use DDP;
-# 
-# my $db = DB_MANAGER;
-# $db->schema_options({
-#     on_connect_call => [ [ rebase_sqlmaker => 'Maple::DBIC' ] ],
-#   });
-
 9999
