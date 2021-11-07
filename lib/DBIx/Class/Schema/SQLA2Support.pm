@@ -1,4 +1,4 @@
-package DBIx::Class::SQLA2::Schema;
+package DBIx::Class::Schema::SQLA2Support;
 use base 'DBIx::Class::Schema';
 __PACKAGE__->mk_classdata('sqla2_subclass');
 __PACKAGE__->mk_classdata('sqla2_rebase_immediately');
