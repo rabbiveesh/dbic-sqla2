@@ -1,1 +1,10 @@
 .*.sw?
+/DBIx-Class-SQLA2-*
+/.build
+/_build_params
+/Build
+/Build.bat
+/local
+!Build/
+!META.json
+!LICENSE
