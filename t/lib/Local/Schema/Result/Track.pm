@@ -8,9 +8,9 @@ use base qw( DBIx::Class::Core );
 __PACKAGE__->table('track');
 
 __PACKAGE__->add_columns(
-  trackid => {data_type => 'integer', is_auto_increment => 1},
-  albumid => {data_type => 'integer',},
-  title   => {data_type => 'text',},
+  trackid => { data_type => 'integer', is_auto_increment => 1 },
+  albumid => { data_type => 'integer', },
+  title   => { data_type => 'text', },
 );
 
 __PACKAGE__->set_primary_key('trackid');

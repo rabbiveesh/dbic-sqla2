@@ -12,7 +12,7 @@ sub connection {
     shift->connect_call_rebase_sqlmaker($self->sqla2_subclass || 'DBIx::Class::SQLA2');
   };
   if (my $calls = $self->storage->on_connect_call) {
-    $self->storage->on_connect_call([$connect, $calls]);
+    $self->storage->on_connect_call([ $connect, $calls ]);
   } else {
     $self->storage->on_connect_call([$connect]);
   }

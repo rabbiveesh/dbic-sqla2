@@ -38,55 +38,57 @@ subtest 'ExtraClauses and BangOverrides' => sub {
   is $schema->storage->connected, 0, 'connected';
 
   # deploy and populate
-  $schema->deploy({add_drop_table => 1});
+  $schema->deploy({ add_drop_table => 1 });
   $schema->resultset('Artist')->populate([
     {
       artistid => 2,
       name     => 'Portishead',
-      albums   => [{title => 'Portishead', rank => 2}, {title => 'Dummy', rank => 3}, {title => 'Third', rank => 4},]
+      albums   =>
+          [ { title => 'Portishead', rank => 2 }, { title => 'Dummy', rank => 3 }, { title => 'Third', rank => 4 }, ]
     },
-    {artistid => 1, name => 'Stone Roses', albums => [{title => 'Second Coming', rank => 1},]},
-    {artistid => 3, name => 'LSG'}
+    { artistid => 1, name => 'Stone Roses', albums => [ { title => 'Second Coming', rank => 1 }, ] },
+    { artistid => 3, name => 'LSG' }
   ]);
   is $schema->storage->connected, 1, 'connected';
   with_role_ok $schema, 'DBIx::Class::SQLA2', 'has role after connection';
 
-  my $simple    = $schema->resultset('Album')->search_rs({}, {'!with' => [foo => {-select => {select => \1}}]});
-  my $query_ref = ${$simple->as_query};
+  my $simple
+      = $schema->resultset('Album')->search_rs({}, { '!with' => [ foo => { -select => { select => \1 } } ] });
+  my $query_ref = ${ $simple->as_query };
   is $query_ref->[0], '(WITH foo AS (SELECT 1) SELECT me.albumid, me.artistid, me.title, me.rank FROM album me)',
-    'simple CTE query';
-  is_deeply [$simple->all],
-    [
-    {'albumid' => 1, 'artistid' => 2, 'rank' => 2, 'title' => 'Portishead'},
-    {'albumid' => 2, 'artistid' => 2, 'rank' => 3, 'title' => 'Dummy'},
-    {'albumid' => 3, 'artistid' => 2, 'rank' => 4, 'title' => 'Third'},
-    {'albumid' => 4, 'artistid' => 1, 'rank' => 1, 'title' => 'Second Coming'},
-    ],
-    'correct';
+      'simple CTE query';
+  is_deeply [ $simple->all ],
+      [
+        { 'albumid' => 1, 'artistid' => 2, 'rank' => 2, 'title' => 'Portishead' },
+        { 'albumid' => 2, 'artistid' => 2, 'rank' => 3, 'title' => 'Dummy' },
+        { 'albumid' => 3, 'artistid' => 2, 'rank' => 4, 'title' => 'Third' },
+        { 'albumid' => 4, 'artistid' => 1, 'rank' => 1, 'title' => 'Second Coming' },
+      ],
+      'correct';
 
-  my $artist = $schema->resultset('Artist')->search_rs({name => 'Portishead'});
+  my $artist = $schema->resultset('Artist')->search_rs({ name => 'Portishead' });
   my $albums = $schema->resultset('Album')->search_rs(
     undef,
     {
-      '!with' => [[qw(band id name)] => $artist->as_query],
+      '!with' => [ [qw(band id name)] => $artist->as_query ],
       '!from' => sub {
         my ($sqla2, $from) = @_;
-        my $orig = $sqla2->expand_expr({-old_from => $from});
-        return [$orig, -join => [band => on => ['band.id' => 'me.artistid']]];
+        my $orig = $sqla2->expand_expr({ -old_from => $from });
+        return [ $orig, -join => [ band => on => [ 'band.id' => 'me.artistid' ] ] ];
       },
-      'columns' => [{band => 'band.name', title => 'title'}]
+      'columns' => [ { band => 'band.name', title => 'title' } ]
     }
   );
-  is ${$albums->as_query}->[0],
-    '(WITH band(id, name) AS (SELECT me.artistid, me.name FROM artist me WHERE ( name = ? )) '
-    . 'SELECT band.name, me.title FROM album me JOIN band ON band.id = me.artistid)', 'correct query';
-  is_deeply [$albums->all],
-    [
-    {'band' => 'Portishead', 'title' => 'Portishead'},
-    {'band' => 'Portishead', 'title' => 'Dummy'},
-    {'band' => 'Portishead', 'title' => 'Third'},
-    ],
-    'Album titles';
+  is ${ $albums->as_query }->[0],
+      '(WITH band(id, name) AS (SELECT me.artistid, me.name FROM artist me WHERE ( name = ? )) '
+      . 'SELECT band.name, me.title FROM album me JOIN band ON band.id = me.artistid)', 'correct query';
+  is_deeply [ $albums->all ],
+      [
+        { 'band' => 'Portishead', 'title' => 'Portishead' },
+        { 'band' => 'Portishead', 'title' => 'Dummy' },
+        { 'band' => 'Portishead', 'title' => 'Third' },
+      ],
+      'Album titles';
 };
 
 subtest 'SQLA2 reconnects' => sub {
@@ -95,11 +97,15 @@ subtest 'SQLA2 reconnects' => sub {
   ok $schema, 'schema created';
 
   # deploy and populate
-  $schema->deploy({add_drop_table => 1});
+  $schema->deploy({ add_drop_table => 1 });
   $schema->resultset('Artist')
-    ->populate([
-    {artistid => 1, name => 'UNKLE', albums => [{title => 'Do Androids Dream of Electric Beats', rank => 1}]}
-    ]);
+      ->populate([
+        {
+          artistid => 1,
+          name     => 'UNKLE',
+          albums   => [ { title => 'Do Androids Dream of Electric Beats', rank => 1 } ]
+        }
+      ]);
   with_role_ok $schema, 'DBIx::Class::SQLA2', 'has role after reconnection';
 
   # disconnect and test role on reconnect
@@ -111,11 +117,11 @@ subtest 'SQLA2 reconnects' => sub {
 
   $schema->storage->ensure_connected;
   with_role_ok $schema, 'DBIx::Class::SQLA2', 'has role after reconnection';
-  my $rs = $schema->resultset('Album')->search(undef, {'!with' => [foo => {-select => {select => \1}}]});
-  like ${$rs->as_query}->[0], qr/^\(WITH/, 'CTE created after reconnect';
-  is_deeply [$rs->all],
-    [{'albumid' => 1, 'artistid' => 1, 'rank' => 1, 'title' => 'Do Androids Dream of Electric Beats'}],
-    'select working';
+  my $rs = $schema->resultset('Album')->search(undef, { '!with' => [ foo => { -select => { select => \1 } } ] });
+  like ${ $rs->as_query }->[0], qr/^\(WITH/, 'CTE created after reconnect';
+  is_deeply [ $rs->all ],
+      [ { 'albumid' => 1, 'artistid' => 1, 'rank' => 1, 'title' => 'Do Androids Dream of Electric Beats' } ],
+      'select working';
 
   # disconnect, set rebase immediately and reconnect
   $schema->storage->disconnect;
@@ -123,11 +129,11 @@ subtest 'SQLA2 reconnects' => sub {
   $schema = $schema->connect("dbi:SQLite:$tmpdir/extraclauses.sqlite");
   is $schema->storage->connected, 0, 'not connected';
 
-  my $with = $schema->resultset('Album')->search(undef, {'!with' => [foo => {-select => {select => \1}}]});
-  like ${$with->as_query}->[0], qr/^\(WITH/, 'CTE created';
-  is_deeply [$with->all],
-    [{'albumid' => 1, 'artistid' => 1, 'rank' => 1, 'title' => 'Do Androids Dream of Electric Beats'}],
-    'select working';
+  my $with = $schema->resultset('Album')->search(undef, { '!with' => [ foo => { -select => { select => \1 } } ] });
+  like ${ $with->as_query }->[0], qr/^\(WITH/, 'CTE created';
+  is_deeply [ $with->all ],
+      [ { 'albumid' => 1, 'artistid' => 1, 'rank' => 1, 'title' => 'Do Androids Dream of Electric Beats' } ],
+      'select working';
 };
 
 subtest 'SQLA2 class level sqla2_rebase_immediately' => sub {
@@ -136,8 +142,8 @@ subtest 'SQLA2 class level sqla2_rebase_immediately' => sub {
   ok $schema, 'created';
   with_role_ok $schema, 'DBIx::Class::SQLA2', 'has role';
 
-  is_deeply [$schema->storage->sql_maker->clauses_of('select')],
-    [qw(with select from where setop group_by having order_by)], 'Correct set of clauses_of select';
+  is_deeply [ $schema->storage->sql_maker->clauses_of('select') ],
+      [qw(with select from where setop group_by having order_by)], 'Correct set of clauses_of select';
 };
 
 subtest 'Alternative subclass' => sub {
