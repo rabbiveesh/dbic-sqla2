@@ -99,13 +99,11 @@ subtest 'SQLA2 reconnects' => sub {
   # deploy and populate
   $schema->deploy({ add_drop_table => 1 });
   $schema->resultset('Artist')
-      ->populate([
-        {
-          artistid => 1,
-          name     => 'UNKLE',
-          albums   => [ { title => 'Do Androids Dream of Electric Beats', rank => 1 } ]
-        }
-      ]);
+      ->populate([ {
+        artistid => 1,
+        name     => 'UNKLE',
+        albums   => [ { title => 'Do Androids Dream of Electric Beats', rank => 1 } ]
+      } ]);
   with_role_ok $schema, 'DBIx::Class::SQLA2', 'has role after reconnection';
 
   # disconnect and test role on reconnect

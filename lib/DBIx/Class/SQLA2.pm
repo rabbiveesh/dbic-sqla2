@@ -10,6 +10,13 @@ use base qw(
 use Role::Tiny;
 with 'DBIx::Class::SQLMaker::Role::SQLA2Passthrough';
 
+sub insert {
+  my ($self, $source, $cols, $tings) = @_;
+  $tings ||= {};
+  # TODO - figure out how to actually get passthru to work!
+  $self->next::method($source, $cols, { $tings->%*, on_conflict => 0 });
+}
+
 sub new {
   my $new = shift->next::method(@_);
   $new->plugin('+ExtraClauses')->plugin('+BangOverrides') unless (grep {m/^with$/} $new->clauses_of('select'));
