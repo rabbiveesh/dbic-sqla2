@@ -4,8 +4,8 @@ use warnings;
 use parent 'DBIx::Class::ResultSet';
 
 sub populate {
-  # TODO - impl here. problem is that the method isn't made to be hooked, how can we just
-  # replace the innards?
+  my ($self, $to_insert, $attrs) = @_;
+  local $self->result_source->storage->sql_maker->{_sqla2_insert_attrs} = $attrs if $attrs;
   shift->next::method(@_);
 }
 

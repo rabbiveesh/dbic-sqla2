@@ -16,7 +16,7 @@ sub insert {
   # user...
   my ($self, $source, $cols, $attrs) = @_;
   $attrs ||= {};
-  if (my $extra_attrs = delete $self->{_sqla2_insert_attrs}) {
+  if (my $extra_attrs = $self->{_sqla2_insert_attrs}) {
     $attrs = { $attrs->%*, $extra_attrs->%* };
   }
   $self->next::method($source, $cols, $attrs);
