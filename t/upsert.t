@@ -26,7 +26,15 @@ $schema->resultset('Artist')->populate([
   { artistid => 3, name => 'LSG' }
 ]);
 
-$schema->resultset('Artist')->search(undef, { on_conflict => 0 })->create({ artistid => 3, name => 'LSD' });
-is $schema->resultset('Artist')->find(3)->{name}, 'LSG', '0 is DO NOTHING';
+subtest 'do nothing' => sub {
+  $schema->resultset('Artist')->create({ artistid => 3, name => 'LSD', -on_conflict => 0 });
+  is $schema->resultset('Artist')->find(3)->{name}, 'LSG', '0 is DO NOTHING';
+};
+
+subtest 'update' => sub {
+  $schema->resultset('Artist')
+      ->create({ artistid => 3, name => 'LSD', -on_conflict => { -set => { name => 'LSD' } } });
+  is $schema->resultset('Artist')->find(3)->{name}, 'LSD', '-set sets (go figure)';
+};
 
 done_testing;

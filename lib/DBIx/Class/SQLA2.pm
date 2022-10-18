@@ -11,10 +11,12 @@ use Role::Tiny;
 with 'DBIx::Class::SQLMaker::Role::SQLA2Passthrough';
 
 sub insert {
-  my ($self, $source, $cols, $tings) = @_;
-  $tings ||= {};
-  # TODO - figure out how to actually get passthru to work!
-  $self->next::method($source, $cols, { $tings->%*, on_conflict => 0 });
+  my ($self, $source, $cols, $attrs) = @_;
+  $attrs ||= {};
+  if (my $extra_attrs = delete $self->{_sqla2_insert_attrs}) {
+    $attrs = { $attrs->%*, $extra_attrs->%* };
+  }
+  $self->next::method($source, $cols, $attrs);
 }
 
 sub new {
