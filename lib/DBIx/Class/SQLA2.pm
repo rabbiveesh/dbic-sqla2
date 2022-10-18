@@ -11,6 +11,9 @@ use Role::Tiny;
 with 'DBIx::Class::SQLMaker::Role::SQLA2Passthrough';
 
 sub insert {
+  # TODO - this works, ish. The issue is that if you have rels involved, you may actually
+  # hit `insert` before the intended insert. Not sure what to do but put that on the
+  # user...
   my ($self, $source, $cols, $attrs) = @_;
   $attrs ||= {};
   if (my $extra_attrs = delete $self->{_sqla2_insert_attrs}) {
