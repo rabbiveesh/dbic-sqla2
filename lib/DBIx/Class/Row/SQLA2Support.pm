@@ -13,10 +13,10 @@ sub new {
 }
 
 sub insert {
-  # TODO - make this work. we could pass the sqla2_attr
   my ($self, @args) = @_;
   my $extras = delete $self->{_sqla2_attrs};
-  local $self->result_source->storage->sql_maker->{_sqla2_insert_attrs} = $extras if $extras;
+  # this should allow relations to fail if they don't have a on_conflict defined
+  local $self->result_source->storage->sql_maker->{_sqla2_insert_attrs} = $extras;
   $self->next::method(@args)
 }
 

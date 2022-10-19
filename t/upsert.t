@@ -44,14 +44,19 @@ subtest 'do nothing on populate' => sub {
     { artistid => 3, name => 'LSG' }
   ], { on_conflict => 0 });
 
+  ok 1, 'hey, we survived!';
   is $schema->resultset('Artist')->count, $old_count, 'count remained the same!';
 
 };
 
 subtest 'update' => sub {
   $schema->resultset('Artist')
-      ->create({ artistid => 3, name => 'LSD', -on_conflict => { -set => { name => 'LSD' } } });
-  is $schema->resultset('Artist')->find(3)->{name}, 'LSD', '-set sets (go figure)';
+      ->create({ artistid => 3, name => 'LSD', -on_conflict => { artistid => { name => 'LSD' } } });
+  is $schema->resultset('Artist')->find(3)->{name}, 'LSD', 'a hash sets';
+
+  # $schema->resultset('Artist')
+  #     ->create({ artistid => 3, name => 'LSB', -upsert => 1 });
+  # is $schema->resultset('Artist')->find(3)->{name}, 'LSD', '-upsert is a shortcut!';
 };
 
 done_testing;
