@@ -1,4 +1,6 @@
 package DBIx::Class::SQLA2;
+use strict;
+use warnings;
 use mro 'c3';
 
 use base qw(
@@ -17,7 +19,7 @@ sub insert {
   my ($self, $source, $cols, $attrs) = @_;
   $attrs ||= {};
   if (my $extra_attrs = $self->{_sqla2_insert_attrs}) {
-    $attrs = { $attrs->%*, $extra_attrs->%* };
+    $attrs = { %$attrs, %$extra_attrs };
   }
   $self->next::method($source, $cols, $attrs);
 }

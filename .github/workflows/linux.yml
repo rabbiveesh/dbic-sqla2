@@ -2,9 +2,7 @@ name: linux
 on:
   push:
     branches:
-      - '*'
-    tags-ignore:
-      - '*'
+      - master
   pull_request:
 jobs:
   perl:
@@ -19,10 +17,10 @@ jobs:
     container:
       image: perl:${{ matrix.perl-version }}
     steps:
-      - uses: actions/checkout@v2
-      - name: perl -V
-        run: perl -V
+      - uses: actions/checkout@v3
+      - name: Install cpm
+        run: curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
       - name: Install dependencies
-        run: cpanm -n --installdeps .
+        run: cpm install -g
       - name: Run tests
         run: prove -l t

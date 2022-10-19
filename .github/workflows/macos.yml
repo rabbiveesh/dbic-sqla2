@@ -2,20 +2,16 @@ name: macos
 on:
   push:
     branches:
-      - '*'
-    tags-ignore:
-      - '*'
+      - master
   pull_request:
 jobs:
   perl:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Perl
-        run: brew install perl
-      - name: perl -V
-        run: perl -V
+        run: brew install perl cpm
       - name: Install Dependencies
-        run: curl -L https://cpanmin.us | perl - --installdeps -n .
+        run: cpm install -g
       - name: Run Tests
         run: prove -l t
