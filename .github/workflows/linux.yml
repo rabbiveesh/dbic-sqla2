@@ -17,10 +17,12 @@ jobs:
           - '5.32'
           - '5.34'
     container:
-      image: perldocker/perl-tester:${{ matrix.perl-version }}
+      image: perl:${{ matrix.perl-version }}
     steps:
       - uses: actions/checkout@v3
+      - name: Install cpm
+        run: curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpm
       - name: Install dependencies
-        run: cpm install -g --installdeps
+        run: cpm install -g
       - name: Run tests
         run: prove -l t
