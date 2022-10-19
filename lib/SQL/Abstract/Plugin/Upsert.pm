@@ -23,11 +23,12 @@ sub register_extensions {
       if (!grep /^-/, keys %$value and keys %$value == 1) {
         my @built;
         for my $target (keys %$value) {
-          my $set    = $sqla->_expand_update_set_values(undef, $value->{$target});
-          my $target = $sqla->expand_expr({ -list => $target }, -ident);
-          return { -target => $target, -set => $set };
+          $value = { -target => $target, -set => $value->{$target} };
         }
       }
+      my $set    = $sqla->_expand_update_set_values(undef, $value->{-set});
+      my $target = $sqla->expand_expr({ -list => $value->{-target} }, -ident);
+      return { -target => $target, -set => $set };
 
       # no expanding to do otherwise, user is handling it
       return $value;

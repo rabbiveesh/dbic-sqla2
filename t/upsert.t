@@ -51,12 +51,15 @@ subtest 'do nothing on populate' => sub {
 
 subtest 'update' => sub {
   $schema->resultset('Artist')
-      ->create({ artistid => 3, name => 'LSD', -on_conflict => { artistid => { name => 'LSD' } } });
-  is $schema->resultset('Artist')->find(3)->{name}, 'LSD', 'a hash sets';
+      ->create({
+          artistid => 3,
+          name => 'LSD',
+          -on_conflict => { artistid => { name => \"name || ' ' || excluded.name" } } });
+  is $schema->resultset('Artist')->find(3)->{name}, 'LSG LSD', 'a hash sets';
 
-  # $schema->resultset('Artist')
-  #     ->create({ artistid => 3, name => 'LSB', -upsert => 1 });
-  # is $schema->resultset('Artist')->find(3)->{name}, 'LSD', '-upsert is a shortcut!';
+  $schema->resultset('Artist')
+      ->create({ artistid => 3, name => 'LSB', -upsert => 1 });
+  is $schema->resultset('Artist')->find(3)->{name}, 'LSB', '-upsert is a shortcut!';
 };
 
 done_testing;

@@ -6,8 +6,15 @@ use parent 'DBIx::Class::Row';
 sub new {
   my ($class, $attrs) = @_;
   my $on_conflict = delete $attrs->{-on_conflict};
+  my $to_upsert = 1 if delete $attrs->{-upsert};
   my $new = $class->next::method($attrs);
   $new->{_sqla2_attrs} = { on_conflict => $on_conflict } if defined $on_conflict;
+  if ($to_upsert) {
+    $to_upsert = { $attrs->%* };
+    my @pks = $new->result_source->primary_columns;
+    delete @$to_upsert{@pks};
+    $new->{_sqla2_attrs} = { on_conflict => { -target => \@pks, -set => $to_upsert }}
+  }
 
   return $new
 }
