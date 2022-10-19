@@ -17,12 +17,10 @@ jobs:
           - '5.32'
           - '5.34'
     container:
-      image: perl:${{ matrix.perl-version }}
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
     steps:
       - uses: actions/checkout@v3
-      - name: perl -V
-        run: perl -V
       - name: Install dependencies
-        run: cpanm -n --installdeps .
+        run: cpm install -g --installdeps
       - name: Run tests
         run: prove -l t
