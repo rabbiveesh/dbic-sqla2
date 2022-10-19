@@ -33,7 +33,7 @@ This will add the following SQLA2 plugins:
 
 # AUTHOR
 
-Copyright (c) 2021-2022 Veesh Goldman <veesh@cpan.org>
+Copyright (c) 2022 Veesh Goldman <veesh@cpan.org>
 
 # LICENSE
 

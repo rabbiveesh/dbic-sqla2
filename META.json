@@ -1,7 +1,7 @@
 {
    "abstract" : "SQL::Abstract v2 support in DBIx::Class",
    "author" : [
-      "Copyright (c) 2021-2022 Veesh Goldman <veesh@cpan.org>"
+      "Copyright (c) 2022 Veesh Goldman <veesh@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010",
