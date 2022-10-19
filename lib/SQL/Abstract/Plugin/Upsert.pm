@@ -1,7 +1,6 @@
 package SQL::Abstract::Plugin::Upsert;
 
 use Moo;
-use DDP;
 with 'SQL::Abstract::Role::Plugin';
 
 sub register_extensions {
@@ -52,4 +51,73 @@ sub register_extensions {
   );
 }
 
-1
+our $VERSION = '0.01';
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+SQL::Abstract::Plugin::Upsert - Upsert (ON CONFLICT) support for SQLA2!
+
+=head1 SYNOPSIS
+
+  # pass this to an SQLA 'insert'
+  { on_conflict => 0 }
+  # ON CONFLICT DO NOTHING
+
+  # Do an update
+  { on_conflict => { id => { name => 'Bob Bobson' } } }
+  # ON CONFLICT (id) DO UPDATE SET name = 'Bob Bobson'
+
+  # Slightly fancier
+  { on_conflict => { id => { name => \'name || ' ' || excluded.name } } }
+  # ON CONFLICT (id) DO UPDATE SET name = name || ' ' || excluded.name
+
+  # More explicit
+  { on_conflict => { -target => 'id', -set => { name => 'Bob Bobson' } } }
+  # ON CONFLICT (id) DO UPDATE SET name = 'Bob Bobson'
+
+=head1 DESCRIPTION
+
+This is a work in progress to support upserts in SQLA2.
+
+B<EXPERIMENTAL>
+
+=head2 Using with DBIx::Class
+
+In order to use this with DBIx::Class, you need to add plugins to your Result and ResultSet classes.
+
+  # In your Result:: Classes (you could also just inherit from it)
+  __PACKAGE__->load_components('Row::SQLA2Support');
+
+  # In your ResultSet Classes (you could also just inherit from it)
+  __PACKAGE__->load_components('ResultSet::SQLA2Support')
+
+Now you can do the following cool things!
+
+=head3 create
+
+When making a new Row (like using $rs->create and friends), you can pass in a -on_conflict key which will get passed through to the INSERT for that row.
+
+  $rs->create({ id => 3, name => 'John', -on_conflict => 0 });
+  # ON CONFLICT DO NOTHING
+  
+You can also pass a -upsert key to let us create the correct ON CONFLICT clause to just
+stomp any existing row. This is safer than the usual find_or_create. This handles
+composite PKs just fine, by the way.
+
+  $rs->create({ id => 3, name => 'Bob Bobson', -upsert => 1 })
+  # ON CONFLICT (id) DO UPDATE SET name = 'Bob Bobson'
+
+=head3 populate
+
+When doing a multi-insert, you can pass in a second arg after the rows to be passed
+through to SQLA2; this allows you to do a blanket ON CONFLICT DO NOTHING for the whole bunch of INSERTs.
+
+  $rs->populate([ 
+    # one million rows later
+  ], { on_conflict => 0 })
+
+=cut

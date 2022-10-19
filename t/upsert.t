@@ -4,13 +4,11 @@ use Test::More;
 use File::Temp ();
 use lib 't/lib';
 use Local::Schema;
-use DDP;
 
 my $tmpdir = File::Temp->newdir;
 my $schema = Local::Schema->connect("dbi:SQLite:$tmpdir/on_conflict.sqlite");
 ok $schema, 'created';
 $schema->storage->ensure_connected;
-$schema->storage->sql_maker->plugin('+Upsert');
 is [ $schema->storage->sql_maker->clauses_of('insert') ]->[4], 'on_conflict', 'on_conflict clause be there';
 
 # deploy + populate
