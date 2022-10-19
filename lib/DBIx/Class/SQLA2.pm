@@ -71,4 +71,8 @@ Adds support for Upserts (ON CONFLICT clause)
 Adds some hacky stuff so you can bypass/supplement DBIC's handling of certain clauses
 
 =back
+
+=head1 AUTHOR
+
+Copyright (c) 2021-2022 Veesh Goldman <veesh@cpan.org>
 =cut
