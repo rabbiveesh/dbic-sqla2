@@ -1,5 +1,7 @@
 package DBIx::Class::Schema::SQLA2Support;
-use base 'DBIx::Class::Schema';
+use strict;
+use warnings;
+use parent 'DBIx::Class::Schema';
 use Scalar::Util qw(weaken);
 __PACKAGE__->mk_classdata('sqla2_subclass');
 __PACKAGE__->mk_classdata('sqla2_rebase_immediately');
