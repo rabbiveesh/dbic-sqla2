@@ -75,4 +75,11 @@ Adds some hacky stuff so you can bypass/supplement DBIC's handling of certain cl
 =head1 AUTHOR
 
 Copyright (c) 2021-2022 Veesh Goldman <veesh@cpan.org>
+
+=head1 LICENSE
+
+This module is free software; you may copy this under the same
+terms as perl itself (either the GNU General Public License or
+the Artistic License)
+
 =cut
