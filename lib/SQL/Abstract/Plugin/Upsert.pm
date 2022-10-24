@@ -16,7 +16,7 @@ sub register_extensions {
     'insert.on_conflict' => sub {
       my ($sqla, $name, $value) = @_;
       # a 0 is DO NOTHING
-      return 'DO NOTHING' unless $value;
+      return { -do => 'NOTHING' } unless $value;
 
       # if we have keys that aren't prefixed by -, it's { TARGET => { SET_THIS => TO_THIS } }
       if (!grep /^-/, keys %$value and keys %$value == 1) {
@@ -28,9 +28,6 @@ sub register_extensions {
       my $set    = $sqla->_expand_update_set_values(undef, $value->{-set});
       my $target = $sqla->expand_expr({ -list => $value->{-target} }, -ident);
       return { -target => $target, -set => $set };
-
-      # no expanding to do otherwise, user is handling it
-      return $value;
     }
   );
   $sqla->clause_renderer(
@@ -38,12 +35,14 @@ sub register_extensions {
       my ($sqla, $type, $value) = @_;
       my @parts;
       @parts = { -keyword => 'on conflict' };
-      if (!ref $value) {
-        push @parts, { -keyword => $value };
-      } else {
-        my ($target, $set) = @$value{qw/-target -set/};
+      if (my $target = $value->{-target}) {
         push @parts, '(', $sqla->render_aqt($target), ')';
-        push @parts, { -keyword => 'do update set' };
+      }
+      if (my $what_to_do = $value->{-do}) {
+        push @parts, { -keyword => "DO $what_to_do" };
+      }
+      if (my $set = $value->{-set}) {
+        push @parts, { -keyword => 'DO UPDATE SET' };
         push @parts, $set;
       }
       $sqla->join_query_parts(' ', @parts);
