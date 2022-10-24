@@ -24,6 +24,12 @@ sub insert {
   $self->next::method($source, $cols, $attrs);
 }
 
+sub expand_clause {
+  my ($self, $clause, $value) = @_;
+  my (undef, $expanded) = $self->${ \$self->clause_expander($clause) }(undef, $value);
+}
+
+
 sub new {
   my $new = shift->next::method(@_);
   $new->plugin('+ExtraClauses')->plugin('+Upsert')->plugin('+BangOverrides')
