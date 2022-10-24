@@ -26,7 +26,12 @@ sub insert {
 
 sub expand_clause {
   my ($self, $clause, $value) = @_;
-  my (undef, $expanded) = $self->${ \$self->clause_expander($clause) }(undef, $value);
+  my ($probably_key, $expanded) = $self->${ \$self->clause_expander($clause) }(undef, $value);
+  if ($expanded) {
+    return ($probably_key => $expanded);
+  } else {
+    return (undef => $probably_key);
+  }
 }
 
 
