@@ -24,6 +24,17 @@ sub insert {
   $self->next::method($source, $cols, $attrs);
 }
 
+sub expand_clause {
+  my ($self, $clause, $value) = @_;
+  my ($probably_key, $expanded) = $self->${ \$self->clause_expander($clause) }(undef, $value);
+  if ($expanded) {
+    return ($probably_key => $expanded);
+  } else {
+    return (undef => $probably_key);
+  }
+}
+
+
 sub new {
   my $new = shift->next::method(@_);
   $new->plugin('+ExtraClauses')->plugin('+Upsert')->plugin('+BangOverrides')

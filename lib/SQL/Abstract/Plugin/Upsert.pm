@@ -16,7 +16,7 @@ sub register_extensions {
     'insert.on_conflict' => sub {
       my ($sqla, $name, $value) = @_;
       # a 0 is DO NOTHING
-      return { -do => 'NOTHING' } unless $value;
+      return (on_conflict => { -do => 'NOTHING' }) unless $value;
 
       # if we have keys that aren't prefixed by -, it's { TARGET => { SET_THIS => TO_THIS } }
       if (!grep /^-/, keys %$value and keys %$value == 1) {
@@ -25,9 +25,9 @@ sub register_extensions {
           $value = { -target => $target, -set => $value->{$target} };
         }
       }
-      my $set    = $sqla->_expand_update_set_values(undef, $value->{-set});
+      my (undef, $set) = $sqla->expand_clause('update.set', $value->{-set});
       my $target = $sqla->expand_expr({ -list => $value->{-target} }, -ident);
-      return { -target => $target, -set => $set };
+      return (on_conflict => { -target => $target, -set => $set });
     }
   );
   $sqla->clause_renderer(
