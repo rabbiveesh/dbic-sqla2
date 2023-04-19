@@ -14,7 +14,7 @@ sub new {
     my @pks = $new->result_source->primary_columns;
     delete @$to_upsert{@pks};
     $new->{_sqla2_attrs}
-        = { on_conflict => { -target => \@pks, -set => { map +($_ => { -ident => "excluded.$_" }), keys $to_upsert->%* } } };
+        = { on_conflict => { -target => \@pks, -set => { map +($_ => { -ident => "excluded.$_" }), keys %$to_upsert } } };
   }
 
   return $new;
