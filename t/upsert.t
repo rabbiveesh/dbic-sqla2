@@ -52,6 +52,7 @@ subtest 'do nothing on populate' => sub {
 };
 
 subtest 'update' => sub {
+  # TODO - get !returning working
   my $updated = $schema->resultset('Artist')
       ->create({
         artistid => 3,
