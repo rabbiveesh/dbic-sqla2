@@ -52,20 +52,18 @@ subtest 'do nothing on populate' => sub {
 };
 
 subtest 'update' => sub {
-  # TODO - get !returning working
   my $updated = $schema->resultset('Artist')
       ->create({
         artistid => 3,
         name     => 'LSD',
         -sqla2   => {
-          on_conflict  => { artistid => { name => \"name || ' ' || excluded.name" } },
-          '!returning' => '*'
+          on_conflict => { artistid => { name => \"name || ' ' || excluded.name" } },
         }
       });
   is $schema->resultset('Artist')->find(3)->{name}, 'LSG LSD', 'a hash sets';
 
   $schema->resultset('Artist')
-      ->upsert({ artistid => 3, name => 'LSB', -sqla2 => { '!returning' => '*' } });
+      ->upsert({ artistid => 3, name => 'LSB' });
   is $schema->resultset('Artist')->find(3)->{name}, 'LSB', '-upsert is a shortcut!';
 };
 
