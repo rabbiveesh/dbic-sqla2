@@ -23,16 +23,41 @@ $schema->resultset('Artist')->populate([
   { artistid => 3, name => 'LSG' }
 ]);
 
-my $ting = $schema->resultset('Artist')
-    ->search(
-      undef,
-      {
-        'columns' => [
-          { 'ting' => { -agg => { group_concat => [ 'name', "', '" ], -filter => { name => { -like => '%e%' } } }, -as => 'prev' } },
-        ]
-      }
-);
+subtest 'using a FILTER clause' => sub {
+  my $ting = $schema->resultset('Artist')
+      ->search(
+        undef,
+        {
+          'columns' => [
+            {
+              'joined' => {
+                -agg => { group_concat => [ 'name', "', '" ], -filter => { name => { -like => '%e%' } } },
+                -as  => 'joined'
+              }
+            },
+          ]
+        }
+      );
 
-is $ting->first->{ting}, 'Stone Roses, Portishead', 'concated right';
+  is $ting->first->{joined}, 'Stone Roses, Portishead', 'concated right';
+};
+
+subtest 'using the OVER clause' => sub {
+  my $ting = $schema->resultset('Artist')
+      ->search(
+        undef,
+        {
+          '+columns' =>
+          [ { 'prev' => { -agg => { lag => ['name'], -over => { order_by => 'artistid' } }, -as => 'prev' } }, ]
+        }
+      );
+  my @all = $ting->all;
+  is_deeply \@all, [
+    { artistid => 1, name => 'Stone Roses', prev => undef },
+    { artistid => 2, name => 'Portishead', prev => 'Stone Roses' },
+    { artistid => 3, name => 'LSG', prev => 'Portishead' },
+  ], 'LAG works!';
+
+};
 
 done_testing;
