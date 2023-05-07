@@ -4,7 +4,7 @@ use feature qw/signatures postderef/;
 use Moo;
 with 'SQL::Abstract::Role::Plugin';
 
-use List::Util qw/first/;
+use List::Util qw/first pairmap/;
 
 no warnings 'experimental::signatures';
 
@@ -25,16 +25,16 @@ sub register_extensions ($self, $sqla) {
   $self->register(
     clause_expander => [
       'select.window' => sub ($sqla, $name, $value) {
-        # I think we can accept a hashref of windows, where each key is the name and each
-        # value is what gets pased to -window
-        ...;
-        $sqla->expand_expr({ -window => $value });
+        return +(window => [ pairmap { +{ -name => $a, -definition => $b } } $value->%* ]);
       },
     ],
     clause_renderer => [
-      'select.window' => sub ($sqla, $name, $value) {
-        ...;
-        # TODO - we need to render lists of `window_name AS ( window_def ), ...`
+      'select.window' => sub ($sqla, $name, $value, @tings) {
+        my @name_defs
+            = map +({ -ident => $_->{-name} }, { -keyword => 'AS' }, '(', { -window => $_->{-definition} }, ')', ','),
+            $value->@*;
+        pop @name_defs;    # remove the last comma
+        $sqla->join_query_parts(' ', { -keyword => 'window' }, @name_defs);
       },
     ],
     expander => [
@@ -117,29 +117,3 @@ sub register_extensions ($self, $sqla) {
 }
 
 1
-
-__DATA__
-supporting the following:
-
-{ -window => [
-  sum => [ 'item_price + tax' ],
-  partition_by => [ qw/asin seller/ ],
-  order_by => 'date',
-  frame => 'literal SQL'
-], -as => 'moving_average'}
-
-alternatively:
-{
-  sum   => 'item_price + tax',
-  -over => {
-    partition_by => [ qw/asin seller/ ],
-    order_by     => 'date',
-    frame        => 'literal SQL'
-  },
-  -filter => {
-    %valid_where_shtuff
-  }
-}
-
-or maybe better yet:
-{ sum => [ 'item_price', -over => { ... }, -filter => { ... }]}

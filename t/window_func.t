@@ -60,4 +60,26 @@ subtest 'using the OVER clause' => sub {
 
 };
 
+subtest 'using the select.window clause' => sub {
+  my $ting = $schema->resultset('Artist')
+      ->search(
+        undef,
+        {
+          '+columns' =>
+          [ { 'prev' => { -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
+          '!window' => {
+            artistid => { order_by => 'artistid' }
+          }
+        }
+      );
+  my @all = $ting->all;
+  is_deeply \@all, [
+    { artistid => 1, name => 'Stone Roses', prev => undef },
+    { artistid => 2, name => 'Portishead', prev => 'Stone Roses' },
+    { artistid => 3, name => 'LSG', prev => 'Portishead' },
+  ], 'LAG works!';
+
+
+};
+
 done_testing;
