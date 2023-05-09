@@ -10,7 +10,34 @@ use base qw(
 );
 
 use Role::Tiny;
-with 'DBIx::Class::SQLMaker::Role::SQLA2Passthrough';
+
+sub select {
+  my ($self, $table, $fields, $where, $rs_attrs, $limit, $offset) = @_;
+
+  $fields = \[ $self->render_expr({ -list => [
+    grep defined,
+    map +(ref($_) eq 'HASH'
+          ? do {
+              my %f = %$_;
+              my $as = delete $f{-as};
+              my ($f, $rhs) = %f;
+              my $func = +{ ($f =~ /^-/ ? $f : "-${f}") => $rhs };
+              ($as
+                ? +{ -op => [ 'as', $func, { -ident => [ $as ] } ] }
+                : $func)
+            }
+          : $_), ref($fields) eq 'ARRAY' ? @$fields : $fields
+  ] }, -ident) ];
+
+  if (my $gb = $rs_attrs->{group_by}) {
+    $rs_attrs = {
+      %$rs_attrs,
+      group_by => \[ $self->render_expr({ -list => $gb }, -ident) ]
+    };
+  }
+  $self->next::method($table, $fields, $where, $rs_attrs, $limit, $offset);
+};
+
 
 sub insert {
   # TODO - this works, ish. The issue is that if you have rels involved, you may actually
@@ -37,7 +64,7 @@ sub expand_clause {
 
 sub new {
   my $new = shift->next::method(@_);
-  $new->plugin('+ExtraClauses')->plugin('+Upsert')->plugin('+BangOverrides')
+  $new->plugin('+ExtraClauses')->plugin('+WindowFunctions')->plugin('+Upsert')->plugin('+BangOverrides')
       unless (grep {m/^with$/} $new->clauses_of('select'));
 }
 
