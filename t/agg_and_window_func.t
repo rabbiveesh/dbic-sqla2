@@ -67,9 +67,9 @@ subtest 'using the select.window clause + order_by gets rich handling' => sub {
         {
           '+columns' =>
           [ { 'prev' => { -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
-          '!window' => {
+          '!window' => [
             artistid => { order_by => { -desc => 'artistid'} }
-          }
+          ]
         }
       );
   my @all = $with_prev->all;
