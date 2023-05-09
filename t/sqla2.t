@@ -141,7 +141,7 @@ subtest 'SQLA2 class level sqla2_rebase_immediately' => sub {
   with_role_ok $schema, 'DBIx::Class::SQLA2', 'has role';
 
   is_deeply [ $schema->storage->sql_maker->clauses_of('select') ],
-      [qw(with select from where group_by having window setop order_by)], 'Correct set of clauses_of select';
+      [qw(with select from where setop group_by having order_by)], 'Correct set of clauses_of select';
 };
 
 subtest 'Alternative subclass' => sub {
