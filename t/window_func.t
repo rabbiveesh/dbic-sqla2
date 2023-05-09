@@ -24,7 +24,7 @@ $schema->resultset('Artist')->populate([
 ]);
 
 subtest 'using a FILTER clause' => sub {
-  my $ting = $schema->resultset('Artist')
+  my $group_concated = $schema->resultset('Artist')
       ->search(
         undef,
         {
@@ -39,11 +39,11 @@ subtest 'using a FILTER clause' => sub {
         }
       );
 
-  is $ting->first->{joined}, 'Stone Roses, Portishead', 'concated right';
+  is $group_concated->first->{joined}, 'Stone Roses, Portishead', 'concated right';
 };
 
 subtest 'using the OVER clause' => sub {
-  my $ting = $schema->resultset('Artist')
+  my $with_prev = $schema->resultset('Artist')
       ->search(
         undef,
         {
@@ -51,7 +51,7 @@ subtest 'using the OVER clause' => sub {
           [ { 'prev' => { -agg => { lag => ['name'], -over => { order_by => 'artistid' } }, -as => 'prev' } }, ]
         }
       );
-  my @all = $ting->all;
+  my @all = $with_prev->all;
   is_deeply \@all, [
     { artistid => 1, name => 'Stone Roses', prev => undef },
     { artistid => 2, name => 'Portishead', prev => 'Stone Roses' },
@@ -60,23 +60,23 @@ subtest 'using the OVER clause' => sub {
 
 };
 
-subtest 'using the select.window clause' => sub {
-  my $ting = $schema->resultset('Artist')
+subtest 'using the select.window clause + order_by gets rich handling' => sub {
+  my $with_prev = $schema->resultset('Artist')
       ->search(
         undef,
         {
           '+columns' =>
           [ { 'prev' => { -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
           '!window' => {
-            artistid => { order_by => 'artistid' }
+            artistid => { order_by => { -desc => 'artistid'} }
           }
         }
       );
-  my @all = $ting->all;
+  my @all = $with_prev->all;
   is_deeply \@all, [
-    { artistid => 1, name => 'Stone Roses', prev => undef },
-    { artistid => 2, name => 'Portishead', prev => 'Stone Roses' },
-    { artistid => 3, name => 'LSG', prev => 'Portishead' },
+    { artistid => 3, name => 'LSG', prev => undef },
+    { artistid => 2, name => 'Portishead', prev => 'LSG' },
+    { artistid => 1, name => 'Stone Roses', prev => 'Portishead' },
   ], 'LAG works!';
 
 
