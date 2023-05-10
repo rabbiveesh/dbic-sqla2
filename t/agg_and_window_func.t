@@ -30,7 +30,7 @@ subtest 'using a FILTER clause' => sub {
         {
           'columns' => [
             {
-              'joined' => {
+              'joined' => \{
                 -agg => { group_concat => [ 'name', "', '" ], -filter => { name => { -like => '%e%' } } },
                 -as  => 'joined'
               }
@@ -48,7 +48,7 @@ subtest 'using the OVER clause' => sub {
         undef,
         {
           '+columns' =>
-          [ { 'prev' => { -agg => { lag => ['name'], -over => { order_by => 'artistid' } }, -as => 'prev' } }, ]
+          [ { 'prev' => \{ -agg => { lag => ['name'], -over => { order_by => 'artistid' } }, -as => 'prev' } }, ]
         }
       );
   my @all = $with_prev->all;
@@ -66,7 +66,7 @@ subtest 'using the select.window clause + order_by gets rich handling' => sub {
         undef,
         {
           '+columns' =>
-          [ { 'prev' => { -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
+          [ { 'prev' => \{ -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
           '!window' => [
             artistid => { order_by => { -desc => 'artistid'} }
           ]

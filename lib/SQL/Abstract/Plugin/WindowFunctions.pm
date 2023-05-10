@@ -151,7 +151,8 @@ SQL::Abstract::Plugin::WindowFunctions - Window Function support for SQLA2!
   # to pass in a window clause in DBIC (this is a thing, you know), you need to use a bang override
   $rs->search(undef, {
     columns => [{ # just the shortest way to specify select columns
-      that_count => { -agg => {
+      # note the hashref-ref; this is how we enable SQLA2 handling for select columns
+      that_count => \{ -agg => {
         count => ['*'],
         -over => 'some_complex_window'
       }, -as => 'that_count' }
@@ -183,6 +184,12 @@ B<EXPERIMENTAL>
 
 In order to use this with DBIx::Class, you simply need to apply the DBIC-SQLA2 plugin, and
 then your SQLMaker will support this syntax!
+
+Just some notes: in order to use the new -agg node in a select list in DBIC, you must pass
+it as a hashref-ref in order to activate the SQLA2 handling.
+
+In order to pass in a window clause, you set it as an RS attribute prefixed with a '!' so
+that it gets rendered.
 
 =head2 New Syntax
 

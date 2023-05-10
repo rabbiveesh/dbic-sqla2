@@ -1,6 +1,8 @@
 package DBIx::Class::SQLA2;
 use strict;
 use warnings;
+use feature 'postderef';
+no warnings 'experimental::postderef';
 use mro 'c3';
 
 use base qw(
@@ -14,29 +16,31 @@ use Role::Tiny;
 sub select {
   my ($self, $table, $fields, $where, $rs_attrs, $limit, $offset) = @_;
 
-  $fields = \[ $self->render_expr({ -list => [
-    grep defined,
-    map +(ref($_) eq 'HASH'
-          ? do {
-              my %f = %$_;
+  my $expand_hashrefref = sub {
+    my $list   = shift;
+    my @fields = ref $list eq 'ARRAY' ? @$list : $list;
+    return [
+      map {
+        ref $_ eq 'REF' && ref $$_ eq 'HASH'
+            ? do {
+              my %f  = $$_->%*;
               my $as = delete $f{-as};
-              my ($f, $rhs) = %f;
-              my $func = +{ ($f =~ /^-/ ? $f : "-${f}") => $rhs };
-              ($as
-                ? +{ -op => [ 'as', $func, { -ident => [ $as ] } ] }
-                : $func)
-            }
-          : $_), ref($fields) eq 'ARRAY' ? @$fields : $fields
-  ] }, -ident) ];
-
+              \[
+                  $as
+                ? $self->render_expr({ -op => [ 'as', \%f, { -ident => $as } ] })
+                : $self->render_expr(\%f)
+              ];
+        }
+            : $_
+      } @fields
+    ];
+  };
+  $fields = $expand_hashrefref->($fields);
   if (my $gb = $rs_attrs->{group_by}) {
-    $rs_attrs = {
-      %$rs_attrs,
-      group_by => \[ $self->render_expr({ -list => $gb }, -ident) ]
-    };
+    $rs_attrs = { %$rs_attrs, group_by => $expand_hashrefref->($gb) };
   }
   $self->next::method($table, $fields, $where, $rs_attrs, $limit, $offset);
-};
+}
 
 
 sub insert {
@@ -91,6 +95,10 @@ For a simple way of using this, take a look at L<DBIx::Class::Schema::SQLA2Suppo
 
 B<EXPERIMENTAL>
 
+This role itself will add handling of hashref-refs to select lists + group by clauses,
+which will render the inner hashref as if it had been passed through to SQLA2 rather than
+doing the recursive function rendering that DBIC does.
+
 =head2 Included Plugins
 
 This will add the following SQLA2 plugins:
@@ -101,6 +109,9 @@ This will add the following SQLA2 plugins:
 
 Adds support for CTEs, and other fun new SQL syntax
 
+=item L<SQL::Abstract::Plugin::WindowFunctions>
+
+Adds support for window functions and advanced aggregates.
 
 =item L<SQL::Abstract::Plugin::Upsert>
 
