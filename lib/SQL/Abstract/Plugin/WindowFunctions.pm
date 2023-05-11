@@ -113,7 +113,7 @@ sub register_extensions ($self, $sqla) {
     window => sub ($sqla, $name, $value) {
       my @parts;
       my %has_keyword = map +($_ => 1), qw/order_by partition_by/;
-      for my $part (qw/base order_by partition_by frame/) {
+      for my $part (qw/base partition_by order_by frame/) {
         next unless $value->{$part};
         push @parts, { -keyword => $part =~ s/_/ /r } if $has_keyword{$part};
         push @parts, $value->{$part};
