@@ -30,9 +30,11 @@ sub register_extensions ($self, $sqla) {
     case => sub ($sqla, $name, $value) {
       my $else = $value->[1];
       $sqla->join_query_parts(
+        ' ',
         { -keyword => 'CASE' },
         (pairmap { ({ -keyword => 'WHEN' }, $a, { -keyword => 'THEN' }, $b) } $value->[0]->@*),
-        $else ? ({ -keyword => 'ELSE' }, $else) : ()
+        $else ? ({ -keyword => 'ELSE' }, $else) : (),
+        { -keyword => 'END' }
       );
     }
   );
