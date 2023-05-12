@@ -52,11 +52,13 @@ subtest 'using the OVER clause' => sub {
         }
       );
   my @all = $with_prev->all;
-  is_deeply \@all, [
-    { artistid => 1, name => 'Stone Roses', prev => undef },
-    { artistid => 2, name => 'Portishead', prev => 'Stone Roses' },
-    { artistid => 3, name => 'LSG', prev => 'Portishead' },
-  ], 'LAG works!';
+  is_deeply \@all,
+      [
+        { artistid => 1, name => 'Stone Roses', prev => undef },
+        { artistid => 2, name => 'Portishead',  prev => 'Stone Roses' },
+        { artistid => 3, name => 'LSG',         prev => 'Portishead' },
+      ],
+      'LAG works!';
 
 };
 
@@ -65,19 +67,20 @@ subtest 'using the select.window clause + order_by gets rich handling' => sub {
       ->search(
         undef,
         {
-          '+columns' =>
-          [ { 'prev' => \{ -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
-          '!window' => [
-            artistid => { order_by => { -desc => 'artistid'} }
+          '+columns' => [ { 'prev' => \{ -agg => { lag => ['name'], -over => 'artistid' }, -as => 'prev' } }, ],
+          '!window'  => [
+            artistid => { order_by => { -desc => 'artistid' } }
           ]
         }
       );
   my @all = $with_prev->all;
-  is_deeply \@all, [
-    { artistid => 3, name => 'LSG', prev => undef },
-    { artistid => 2, name => 'Portishead', prev => 'LSG' },
-    { artistid => 1, name => 'Stone Roses', prev => 'Portishead' },
-  ], 'LAG works!';
+  is_deeply \@all,
+      [
+        { artistid => 3, name => 'LSG',         prev => undef },
+        { artistid => 2, name => 'Portishead',  prev => 'LSG' },
+        { artistid => 1, name => 'Stone Roses', prev => 'Portishead' },
+      ],
+      'LAG works!';
 
 
 };
