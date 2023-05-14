@@ -12,9 +12,8 @@ sub register_extensions ($self, $sqla) {
 
   $sqla->expander(
     case => sub ($sqla, $name, $value) {
-      # if the user passed in something other than an if/then hashref up top, it's already
-      # expanded
-      return { -case => $value } if !$value->[0]{if};
+      # if the user passed in the double array-ref, then we assume it's already expanded
+      return { -case => $value } if ref $value->[0] eq 'ARRAY';
       my $else;
       my @conditions = $value->@*;
       $else = pop @conditions unless @conditions * %2;

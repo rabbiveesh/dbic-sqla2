@@ -45,4 +45,27 @@ subtest 'using a CASE expression' => sub {
   ], 'got expected result';
 };
 
+subtest 'passes through the double arrayref syntax' => sub {
+  my @oddity = $schema->resultset('Album')->search(undef, {
+      'columns' => [
+        'rank',
+        'title',
+        { oddity => \{ -case => [
+              [{ -func => [ 'mod', 'rank', 2 ] } => { -bind => [ undef, 'Quite Odd' ] }],
+              { -bind => [ undef, 'Even']}
+            ] ,
+        -as => 'oddity'}
+    }],
+        order_by => { -asc => 'rank'}
+    })->all;
+
+  is_deeply \@oddity, [
+    { title => 'Second Coming', rank => 1, oddity => 'Quite Odd'},
+    { title => 'Portishead', rank => 2, oddity => 'Even'},
+    { title => 'Dummy', rank => 3, oddity => 'Quite Odd'},
+    { title => 'Third', rank => 4, oddity => 'Even'},
+  ], 'got expected result';
+
+};
+
 done_testing;
