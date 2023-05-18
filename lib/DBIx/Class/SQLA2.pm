@@ -68,8 +68,10 @@ sub expand_clause {
 
 sub new {
   my $new = shift->next::method(@_);
-  $new->plugin('+ExtraClauses')->plugin('+WindowFunctions')->plugin('+Upsert')->plugin('+BangOverrides')
-      unless (grep {m/^with$/} $new->clauses_of('select'));
+  unless (grep {m/^with$/} $new->clauses_of('select')) {
+    $new->plugin("+$_") for qw/ExtraClauses WindowFunctions Upsert BangOverrides CaseExpr/;
+  }
+  return $new
 }
 
 our $VERSION = '0.01';
