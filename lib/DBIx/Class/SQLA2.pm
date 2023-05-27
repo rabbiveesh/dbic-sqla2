@@ -13,31 +13,40 @@ use base qw(
 
 use Role::Tiny;
 
+sub _render_hashrefrefs {
+  my ($self, $list) = @_;
+  my @fields = ref $list eq 'ARRAY' ? @$list : $list;
+  return [
+    map {
+      ref $_ eq 'REF' && ref $$_ eq 'HASH'
+          ? do {
+            my %f  = $$_->%*;
+            my $as = delete $f{-as};
+            \[
+                $as
+              ? $self->render_expr({ -op => [ 'as', \%f, { -ident => $as } ] })
+              : $self->render_expr(\%f)
+            ];
+      }
+          : $_
+    } @fields
+  ];
+}
+
+sub _recurse_fields {
+  my ($self, $fields) = @_;
+  if (ref $fields eq 'REF' && ref $$fields eq 'HASH') {
+    return $self->next::method($self->_render_hashrefrefs($fields)->[0]);
+  }
+  return $self->next::method($fields);
+
+}
+
 sub select {
   my ($self, $table, $fields, $where, $rs_attrs, $limit, $offset) = @_;
 
-  my $expand_hashrefref = sub {
-    my $list   = shift;
-    my @fields = ref $list eq 'ARRAY' ? @$list : $list;
-    return [
-      map {
-        ref $_ eq 'REF' && ref $$_ eq 'HASH'
-            ? do {
-              my %f  = $$_->%*;
-              my $as = delete $f{-as};
-              \[
-                  $as
-                ? $self->render_expr({ -op => [ 'as', \%f, { -ident => $as } ] })
-                : $self->render_expr(\%f)
-              ];
-        }
-            : $_
-      } @fields
-    ];
-  };
-  $fields = $expand_hashrefref->($fields);
   if (my $gb = $rs_attrs->{group_by}) {
-    $rs_attrs = { %$rs_attrs, group_by => $expand_hashrefref->($gb) };
+    $rs_attrs = { %$rs_attrs, group_by => $self->_render_hashrefrefs($gb) };
   }
   $self->next::method($table, $fields, $where, $rs_attrs, $limit, $offset);
 }
@@ -71,7 +80,7 @@ sub new {
   unless (grep {m/^with$/} $new->clauses_of('select')) {
     $new->plugin("+$_") for qw/ExtraClauses WindowFunctions Upsert BangOverrides CaseExpr/;
   }
-  return $new
+  return $new;
 }
 
 our $VERSION = '0.01';
