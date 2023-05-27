@@ -1,7 +1,7 @@
 package SQL::Abstract::Plugin::CaseExpr;
 use feature qw/signatures postderef/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.01_2';
 use Moo;
 with 'SQL::Abstract::Role::Plugin';
 use List::Util qw/pairmap/;
