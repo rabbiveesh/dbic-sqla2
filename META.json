@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "DBIx::Class" : "0.082843",
-            "SQL::Abstract" : "2.000001"
+            "SQL::Abstract" : "2.000001",
+            "perl" : "5.22"
          }
       },
       "test" : {
@@ -66,7 +67,7 @@
          "web" : "https://github.com/rabbiveesh/dbic-sqla2"
       }
    },
-   "version" : "0.01",
+   "version" : "0.01_2",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "Veesh Goldman <rabbiveesh@gmail.com>"

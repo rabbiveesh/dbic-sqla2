@@ -1,1 +1,4 @@
 name = 'DBIx-Class-SQLA2'
+
+[FileGatherer]
+exclude_match = [ '^ideas/*' ]

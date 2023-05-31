@@ -1,3 +1,10 @@
 {{$NEXT}}
-  Initial release; ExtraClauses, BangOverrides and Upsert support!
+
+0.01_2 2023-05-27T20:34:54Z
+
+  Update hashrefref support to hook _recurse_fields such that join pruning no longer
+  explodes
+
+0.01 2023-05-21T15:01:10Z
+  Initial release; ExtraClauses, BangOverrides, Upsert, WindowFunction and CaseExpr support!
   SUPER EXPERIMENTAL!

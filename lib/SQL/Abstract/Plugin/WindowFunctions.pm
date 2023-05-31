@@ -1,7 +1,7 @@
 package SQL::Abstract::Plugin::WindowFunctions;
 use feature qw/signatures postderef/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.01_2';
 use Moo;
 with 'SQL::Abstract::Role::Plugin';
 

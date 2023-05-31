@@ -15,6 +15,10 @@ For a simple way of using this, take a look at [DBIx::Class::Schema::SQLA2Suppor
 
 **EXPERIMENTAL**
 
+This role itself will add handling of hashref-refs to select lists + group by clauses,
+which will render the inner hashref as if it had been passed through to SQLA2 rather than
+doing the recursive function rendering that DBIC does.
+
 ## Included Plugins
 
 This will add the following SQLA2 plugins:
@@ -22,6 +26,10 @@ This will add the following SQLA2 plugins:
 - [SQL::Abstract::Plugin::ExtraClauses](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3APlugin%3A%3AExtraClauses)
 
     Adds support for CTEs, and other fun new SQL syntax
+
+- [SQL::Abstract::Plugin::WindowFunctions](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3APlugin%3A%3AWindowFunctions)
+
+    Adds support for window functions and advanced aggregates.
 
 - [SQL::Abstract::Plugin::Upsert](https://metacpan.org/pod/SQL%3A%3AAbstract%3A%3APlugin%3A%3AUpsert)
 
