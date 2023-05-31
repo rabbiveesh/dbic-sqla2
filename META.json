@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "DBIx::Class" : "0.082843",
-            "SQL::Abstract" : "2.000001"
+            "SQL::Abstract" : "2.000001",
+            "perl" : "5.22"
          }
       },
       "test" : {
