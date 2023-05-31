@@ -1,5 +1,5 @@
 # -*- mode: perl -*-
-requires 'perl'          => '5.22';
+requires 'perl'          => 'v5.22';
 requires 'DBIx::Class'   => '0.082843';
 requires 'SQL::Abstract' => '2.000001';
 
