@@ -25,7 +25,7 @@ $schema->resultset('Artist')->populate([
 ]);
 
 subtest 'do nothing' => sub {
-  $schema->resultset('Artist')->create({ artistid => 3, name => 'LSD', -on_conflict => 0 });
+  $schema->resultset('Artist')->create({ artistid => 3, name => 'LSD', -sqla2 => { on_conflict => 0 } });
   is $schema->resultset('Artist')->find(3)->{name}, 'LSG', '0 is DO NOTHING';
 };
 
@@ -52,16 +52,18 @@ subtest 'do nothing on populate' => sub {
 };
 
 subtest 'update' => sub {
-  $schema->resultset('Artist')
+  my $updated = $schema->resultset('Artist')
       ->create({
-        artistid     => 3,
-        name         => 'LSD',
-        -on_conflict => { artistid => { name => \"name || ' ' || excluded.name" } }
+        artistid => 3,
+        name     => 'LSD',
+        -sqla2   => {
+          on_conflict => { artistid => { name => \"name || ' ' || excluded.name" } },
+        }
       });
   is $schema->resultset('Artist')->find(3)->{name}, 'LSG LSD', 'a hash sets';
 
   $schema->resultset('Artist')
-      ->create({ artistid => 3, name => 'LSB', -upsert => 1 });
+      ->upsert({ artistid => 3, name => 'LSB' });
   is $schema->resultset('Artist')->find(3)->{name}, 'LSB', '-upsert is a shortcut!';
 };
 
