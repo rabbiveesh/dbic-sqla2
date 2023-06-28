@@ -6,6 +6,19 @@ our $VERSION = '0.01_2';
 use Moo;
 extends 'SQL::Abstract::Plugin::ExtraClauses';
 
+# NOTE - upstream impl fails to put `group_by` and `having` before the setops; that's
+# fixed here
+sub _expand_select {
+  my ($self, $orig, $before_setop, @args) = @_;
+  my $exp = $self->sqla->$orig(@args);
+  return $exp unless my $setop = (my $sel = $exp->{-select})->{setop};
+  if (my @keys = grep $sel->{$_}, @$before_setop, qw/group_by having/) {
+    my %inner; @inner{@keys} = delete @{$sel}{@keys};
+    unshift @{(values(%$setop))[0]{queries}},
+      { -select => \%inner };
+  }
+  return $exp;
+}
 
 sub _expand_join {
   my ($self, undef, $args) = @_;
