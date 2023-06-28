@@ -13,6 +13,8 @@ use base qw(
 
 use Role::Tiny;
 
+__PACKAGE__->mk_group_accessors(simple => '_connection_info');
+
 sub _render_hashrefrefs {
   my ($self, $list) = @_;
   my @fields = ref $list eq 'ARRAY' ? @$list : $list;

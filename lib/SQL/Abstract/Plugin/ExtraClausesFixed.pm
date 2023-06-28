@@ -1,14 +1,17 @@
 package SQL::Abstract::Plugin::ExtraClausesFixed;
-use feature qw/signatures postderef/;
+use Moo;
+use experimental qw/signatures postderef/;
 # TODO - get this upstreamed - `using` is borken RN b/c 
 
 our $VERSION = '0.01_2';
-use Moo;
 extends 'SQL::Abstract::Plugin::ExtraClauses';
 
 has no_setop_parens => (
-  is => 'rw',
-  default => sub {1}
+  is => 'lazy',
+  builder => sub ($self) {
+    my $details = $self->sqla->_connection_info;
+    return $details->{SQL_DBMS_NAME} eq 'SQLite';
+  }
 );
 
 # NOTE - upstream impl fails to put `group_by` and `having` before the setops; that's
