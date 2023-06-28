@@ -11,12 +11,18 @@ sub connection {
   my $connect = sub {
     shift->connect_call_rebase_sqlmaker($self->sqla2_subclass || 'DBIx::Class::SQLA2');
   };
+  my $details = sub {
+    my $storage = shift;
+    if ($storage->sql_maker->can('_connection_info')) {
+      $storage->sql_maker->_connection_info($storage->_describe_connection);
+    }
+  };
   if (my $calls = $self->storage->on_connect_call) {
-    $self->storage->on_connect_call([ $connect, $calls ]);
+    $self->storage->on_connect_call([ $connect, $calls, $details ]);
   } else {
-    $self->storage->on_connect_call([$connect]);
+    $self->storage->on_connect_call([ $connect, $details ]);
   }
-  $connect->($self->storage) if ($self->sqla2_rebase_immediately);
+  $connect->($self->storage) if $self->sqla2_rebase_immediately;
   return $self;
 }
 
