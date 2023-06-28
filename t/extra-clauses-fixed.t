@@ -40,11 +40,9 @@ subtest 'setops work properly re a group_by' => sub {
   };
   my $portis = $count_rs->('Portishead');
   my $stone  = $count_rs->('Stone Roses');
-  # TODO - unfortunately, this is currently broken on SQLite, b/c it dosn't allow you to
-  # use parens for the subqueries of the setop. I am not yet sure how to work around this
-  like $portis->search(undef, { '!union' => $stone->as_query, order_by => 'name' })->as_query,
-      \['((SELECT name, count(albumid) as count FROM artist me LEFT JOIN album albums ON albums.artistid = me.artistid WHERE ( name = ? ) GROUP BY name) UNION (SELECT name, count(albumid) as count FROM artist me LEFT JOIN album albums ON albums.artistid = me.artistid WHERE ( name = ? ) GROUP BY name)  ORDER BY name)'
-      ], 'renders as expected';
+  
+  like [ $portis->search(undef, { '!union' => $stone->as_query, order_by => 'name' })->all ],
+  [ { name => 'Portishead', count => 3 }, { name => 'Stone Roses', count => 1 }], 'unions work as expected';
 
 };
 

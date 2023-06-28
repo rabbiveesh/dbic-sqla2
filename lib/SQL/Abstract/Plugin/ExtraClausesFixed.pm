@@ -6,6 +6,11 @@ our $VERSION = '0.01_2';
 use Moo;
 extends 'SQL::Abstract::Plugin::ExtraClauses';
 
+has no_setop_parens => (
+  is => 'rw',
+  default => sub {1}
+);
+
 # NOTE - upstream impl fails to put `group_by` and `having` before the setops; that's
 # fixed here
 sub _expand_select {
@@ -18,6 +23,21 @@ sub _expand_select {
       { -select => \%inner };
   }
   return $exp;
+}
+
+sub _render_setop {
+  my ($self, $setop, $args) = @_;
+  if ($self->no_setop_parens) {
+    for my $q (@{$args->{queries}}) {
+      if ($q->{-literal}) {
+        $q->{-literal}[0] =~ s/^\(|\)$//g;
+      }
+    }
+  }
+  $self->join_query_parts(
+    { -keyword => ' '.join('_', $setop, ($args->{type}||())).' ' },
+    map $self->render_aqt($_, $self->no_setop_parens), @{$args->{queries}}
+  );
 }
 
 # NOTE - upstream accidentally double expands `using`, so we need to replace that here
