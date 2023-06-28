@@ -84,7 +84,7 @@ sub new {
   return $new;
 }
 
-our $VERSION = '0.01_2';
+our $VERSION = '0.01_3';
 
 1;
 
