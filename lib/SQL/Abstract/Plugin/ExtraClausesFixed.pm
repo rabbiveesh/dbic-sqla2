@@ -20,6 +20,7 @@ sub _expand_select {
   return $exp;
 }
 
+# NOTE - upstream accidentally double expands `using`, so we need to replace that here
 sub _expand_join {
   my ($self, undef, $args) = @_;
   my %proto = (
