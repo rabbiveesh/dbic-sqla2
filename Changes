@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+  add ExtraClausesFixed which fixes bugs with `using` in `join`s, and `setop`s with
+  `group_by` and on SQLite. This is applied by default to the sql_maker
+
 0.01_2 2023-05-27T20:34:54Z
 
   Update hashrefref support to hook _recurse_fields such that join pruning no longer
