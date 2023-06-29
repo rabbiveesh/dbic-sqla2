@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+  Fix ExtraClausesFixed 🤦; `using` now is actually correct
+
 0.01_3 2023-06-28T19:39:35Z
 
   add ExtraClausesFixed which fixes bugs with `using` in `join`s, and `setop`s with
