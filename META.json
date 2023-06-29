@@ -68,7 +68,7 @@
          "web" : "https://github.com/rabbiveesh/dbic-sqla2"
       }
    },
-   "version" : "0.01_3",
+   "version" : "0.01_4",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "Veesh Goldman <rabbiveesh@gmail.com>"
