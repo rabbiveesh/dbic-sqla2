@@ -53,17 +53,13 @@ subtest 'do nothing on populate' => sub {
 
 subtest 'update' => sub {
   my $updated = $schema->resultset('Artist')
-      ->create({
-        artistid => 3,
-        name     => 'LSD',
-        -sqla2   => {
-          on_conflict => { artistid => { name => \"name || ' ' || excluded.name" } },
-        }
-      });
+      ->upsert({ artistid => 3, name => 'LSD' }, name => \"name || ' ' || excluded.name");
+  is $updated->name,                                'LSG LSD', 'holycrud, our fancy RETURNING werkz';
   is $schema->resultset('Artist')->find(3)->{name}, 'LSG LSD', 'a hash sets';
 
-  $schema->resultset('Artist')
+  my $returned = $schema->resultset('Artist')
       ->upsert({ artistid => 3, name => 'LSB' });
+  is $returned->name,                               'LSB', 'returned row is properly updated';
   is $schema->resultset('Artist')->find(3)->{name}, 'LSB', '-upsert is a shortcut!';
 };
 
