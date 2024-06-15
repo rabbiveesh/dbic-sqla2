@@ -44,13 +44,14 @@
          "requires" : {
             "DBIx::Class" : "0.082843",
             "SQL::Abstract" : "2.000001",
-            "perl" : "5.22"
+            "perl" : "v5.22.0"
          }
       },
       "test" : {
          "requires" : {
             "DBD::SQLite" : "0",
             "SQL::Translator" : "1.62",
+            "Test2::V0" : "0.000155",
             "Test::More" : "0.98"
          }
       }
@@ -67,7 +68,7 @@
          "web" : "https://github.com/rabbiveesh/dbic-sqla2"
       }
    },
-   "version" : "0.01_2",
+   "version" : "0.01_4",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "Veesh Goldman <rabbiveesh@gmail.com>"

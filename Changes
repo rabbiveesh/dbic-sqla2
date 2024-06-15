@@ -1,5 +1,14 @@
 {{$NEXT}}
 
+0.01_4 2023-06-29T17:10:15Z
+
+  Fix ExtraClausesFixed 🤦; `using` now is actually correct
+
+0.01_3 2023-06-28T19:39:35Z
+
+  add ExtraClausesFixed which fixes bugs with `using` in `join`s, and `setop`s with
+  `group_by` and on SQLite. This is applied by default to the sql_maker
+
 0.01_2 2023-05-27T20:34:54Z
 
   Update hashrefref support to hook _recurse_fields such that join pruning no longer

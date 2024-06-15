@@ -50,7 +50,7 @@ sub register_extensions {
   );
 }
 
-our $VERSION = '0.01_2';
+our $VERSION = '0.01_4';
 
 1;
 
