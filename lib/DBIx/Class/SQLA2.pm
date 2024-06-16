@@ -105,6 +105,17 @@ most recent version of DBIC.
 
 For a simple way of using this, take a look at L<DBIx::Class::Schema::SQLA2Support>.
 
+In order to have inserts passthru SQLA2 keys, you should use the
+L<DBIx::Class::Row::SQLA2Support> component, which allows you to add a C<-sqla2> key w/ a
+hashref containing your passthroughs.
+
+In order to support SQLA2 keys for bulk inserts (C<populate>), use the
+L<DBIx::Class::ResultSet::SQLA2Support> component. It adds a second arg to C<populate> which
+allows you to add things to the final query (though you may get undefined behavior if
+you're creating deep relationships - real world experience would be nice here). In
+addition, it adds an C<upsert> method to simplify the case of update on a primary
+key conflict (see there for more details).
+
 B<EXPERIMENTAL>
 
 This role itself will add handling of hashref-refs to select lists + group by clauses,
@@ -137,7 +148,7 @@ Adds some hacky stuff so you can bypass/supplement DBIC's handling of certain cl
 
 =head1 AUTHOR
 
-Copyright (c) 2022 Veesh Goldman <veesh@cpan.org>
+Copyright (c) 2022-24 Veesh Goldman <veesh@cpan.org>
 
 =head1 LICENSE
 

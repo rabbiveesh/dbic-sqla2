@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+  *BREAKING CHANGE*
+  - Change passthrough methods for insert/update to pull any values out of a -sqla2 key
+    instead of special casing ones we support.
+  - Add an `upsert` method to the ResultSet component which handles resolving the PK
+    constraint, and also automates RETURNING the upserted values correctly (see the docs)
+
 0.01_4 2023-06-29T17:10:15Z
 
   Fix ExtraClausesFixed 🤦; `using` now is actually correct
