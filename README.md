@@ -13,6 +13,17 @@ most recent version of DBIC.
 
 For a simple way of using this, take a look at [DBIx::Class::Schema::SQLA2Support](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3ASQLA2Support).
 
+In order to have inserts passthru SQLA2 keys, you should use the
+[DBIx::Class::Row::SQLA2Support](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ARow%3A%3ASQLA2Support) component, which allows you to add a `-sqla2` key w/ a
+hashref containing your passthroughs.
+
+In order to support SQLA2 keys for bulk inserts (`populate`), use the
+[DBIx::Class::ResultSet::SQLA2Support](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet%3A%3ASQLA2Support) component. It adds a second arg to `populate` which
+allows you to add things to the final query (though you may get undefined behavior if
+you're creating deep relationships - real world experience would be nice here). In
+addition, it adds an `upsert` method to simplify the case of update on a primary
+key conflict (see there for more details).
+
 **EXPERIMENTAL**
 
 This role itself will add handling of hashref-refs to select lists + group by clauses,
@@ -41,7 +52,7 @@ This will add the following SQLA2 plugins:
 
 # AUTHOR
 
-Copyright (c) 2022 Veesh Goldman <veesh@cpan.org>
+Copyright (c) 2022-24 Veesh Goldman <veesh@cpan.org>
 
 # LICENSE
 

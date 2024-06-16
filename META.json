@@ -1,10 +1,10 @@
 {
    "abstract" : "SQL::Abstract v2 support in DBIx::Class",
    "author" : [
-      "Copyright (c) 2022 Veesh Goldman <veesh@cpan.org>"
+      "Copyright (c) 2022-24 Veesh Goldman <veesh@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,12 +44,12 @@
          "requires" : {
             "DBIx::Class" : "0.082843",
             "SQL::Abstract" : "2.000001",
-            "perl" : "v5.22.0"
+            "perl" : "v5.30.0"
          }
       },
       "test" : {
          "requires" : {
-            "DBD::SQLite" : "0",
+            "DBD::SQLite" : "1.68",
             "SQL::Translator" : "1.62",
             "Test2::V0" : "0.000155",
             "Test::More" : "0.98"
@@ -68,11 +68,11 @@
          "web" : "https://github.com/rabbiveesh/dbic-sqla2"
       }
    },
-   "version" : "0.01_4",
+   "version" : "0.01_5",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "Veesh Goldman <rabbiveesh@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }
