@@ -3,7 +3,7 @@ use Moo;
 use experimental qw/signatures postderef/;
 # TODO - get this upstreamed - `using` is borken RN b/c
 
-our $VERSION = '0.01_5';
+our $VERSION = '0.02_1';
 extends 'SQL::Abstract::Plugin::ExtraClauses';
 
 has no_setop_parens => (

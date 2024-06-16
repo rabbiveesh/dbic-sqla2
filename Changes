@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.02_1 2024-06-16T15:26:22Z
+
+  Same as 0.02_1, but with the correct version number to reflect the change
+
 0.01_5 2024-06-16T15:09:31Z
 
   *BREAKING CHANGE*
