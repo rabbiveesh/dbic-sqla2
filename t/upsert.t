@@ -63,4 +63,17 @@ subtest 'update' => sub {
   is $schema->resultset('Artist')->find(3)->{name}, 'LSB', '-upsert is a shortcut!';
 };
 
+subtest 'populate_upsert' => sub {
+  my $artist_rs = $schema->resultset('Artist');
+  $artist_rs->populate([ { artistid => 9000, name => 'Fame' }, { artistid => 9001, name => 'Lame' }]);
+
+  $artist_rs->populate_upsert([ { artistid => 9000, name => 'Fame' }, { artistid => 9001, name => 'Lame' }], { name => \"name || '--' || excluded.name" });
+
+  my @artists = $artist_rs->search({ artistid => { '>=' => 9000 }}, { order_by => 'artistid' });
+
+  is $artists[0]->{name}, 'Fame--Fame', 'first artist updated';
+  is $artists[1]->{name}, 'Lame--Lame', 'second artist updated';
+
+};
+
 done_testing;
