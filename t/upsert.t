@@ -25,7 +25,7 @@ $schema->resultset('Artist')->populate([
 ]);
 
 subtest 'do nothing' => sub {
-  $schema->resultset('Artist')->create({ artistid => 3, name => 'LSD', -on_conflict => 0 });
+  $schema->resultset('Artist')->create({ artistid => 3, name => 'LSD', -sqla2 => { on_conflict => 0 } });
   is $schema->resultset('Artist')->find(3)->{name}, 'LSG', '0 is DO NOTHING';
 };
 
@@ -52,17 +52,28 @@ subtest 'do nothing on populate' => sub {
 };
 
 subtest 'update' => sub {
-  $schema->resultset('Artist')
-      ->create({
-        artistid     => 3,
-        name         => 'LSD',
-        -on_conflict => { artistid => { name => \"name || ' ' || excluded.name" } }
-      });
+  my $updated = $schema->resultset('Artist')
+      ->upsert({ artistid => 3, name => 'LSD' }, { name => \"name || ' ' || excluded.name" });
+  is $updated->name,                                'LSG LSD', 'holycrud, our fancy RETURNING werkz';
   is $schema->resultset('Artist')->find(3)->{name}, 'LSG LSD', 'a hash sets';
 
-  $schema->resultset('Artist')
-      ->create({ artistid => 3, name => 'LSB', -upsert => 1 });
+  my $returned = $schema->resultset('Artist')
+      ->upsert({ artistid => 3, name => 'LSB' });
+  is $returned->name,                               'LSB', 'returned row is properly updated';
   is $schema->resultset('Artist')->find(3)->{name}, 'LSB', '-upsert is a shortcut!';
+};
+
+subtest 'populate_upsert' => sub {
+  my $artist_rs = $schema->resultset('Artist');
+  $artist_rs->populate([ { artistid => 9000, name => 'Fame' }, { artistid => 9001, name => 'Lame' }]);
+
+  $artist_rs->populate_upsert([ { artistid => 9000, name => 'Fame' }, { artistid => 9001, name => 'Lame' }], { name => \"name || '--' || excluded.name" });
+
+  my @artists = $artist_rs->search({ artistid => { '>=' => 9000 }}, { order_by => 'artistid' });
+
+  is $artists[0]->{name}, 'Fame--Fame', 'first artist updated';
+  is $artists[1]->{name}, 'Lame--Lame', 'second artist updated';
+
 };
 
 done_testing;
